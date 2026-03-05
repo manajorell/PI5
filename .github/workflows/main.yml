@@ -16,8 +16,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Download Gradle wrapper
+        run: |
+          mkdir -p gradle/wrapper
+          curl -L "https://services.gradle.org/distributions/gradle-8.7-bin.zip" -o gradle-8.7-bin.zip
+          curl -L "https://raw.githubusercontent.com/gradle/gradle/v8.7.0/gradle/wrapper/gradle-wrapper.jar" -o gradle/wrapper/gradle-wrapper.jar
+
       - name: Make gradlew executable
-        run: chmod +x gradlew
+        run: |
+          cat > gradlew << 'GRADLEW'
+          #!/bin/sh
+          exec java -jar "$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar" "$@"
+          GRADLEW
+          chmod +x gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon
